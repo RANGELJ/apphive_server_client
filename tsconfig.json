@@ -6,10 +6,12 @@
     "outDir": "./dist",
 
     "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleResolution": "node",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "commonjs",
+    "module": "ESNext",
     "target": "esnext",
     "types": [],
     // For nodejs:
