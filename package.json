@@ -1,0 +1,25 @@
+{
+  "name": "@rangeljl/apphive_server_client",
+  "version": "1.0.0",
+  "description": "A set of hooks and functions that applications that query the apphive server uses",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RANGELJ/apphive_server_client.git"
+  },
+  "author": "Rangel Peralta Jorge Luis",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RANGELJ/apphive_server_client/issues"
+  },
+  "homepage": "https://github.com/RANGELJ/apphive_server_client#readme",
+  "peerDependencies": {
+    "@rangeljl/shared": "^9.0.*"
+  },
+  "devDependencies": {
+    "@rangeljl/shared": "^9.0.1"
+  }
+}
