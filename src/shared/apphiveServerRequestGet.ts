@@ -4,7 +4,7 @@ type Args = {
   serverHost: string
   getIdToken: () => Promise<string | null>
   path: `/${string}`
-  searchParams?: [string, string | undefined][]
+  searchParams?: [string, string | undefined][] | undefined
 }
 
 const apphiveServerRequestGet = async <ReturnType = unknown>({
