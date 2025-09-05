@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useRef } from 'react'
 import unknownIsNumber from '@rangeljl/shared/unknownIsNumber'
 import useApphiveServerSuspenseQuery from './useApphiveServerSuspenseQuery'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
@@ -39,6 +39,9 @@ const useModelUpdatesListener = ({
     return `updates/models/${modelNameId}/${modelPropId}/${modelProp.identifier}`
   })
 
+  const refetchRef = useRef(refetch)
+  refetchRef.current = refetch
+
   const updatedFromServerAt = updatedAtFromServer ?? 0
 
   useEffect(() => {
@@ -53,7 +56,7 @@ const useModelUpdatesListener = ({
         clearTimeout(refetchTimeoutId)
       }
 
-      refetchTimeoutId = setTimeout(refetch, 100)
+      refetchTimeoutId = setTimeout(refetchRef.current, 100)
     }
 
     const listener = (updatedFromFirebaseAt: unknown) => {
@@ -78,7 +81,7 @@ const useModelUpdatesListener = ({
         clearTimeout(refetchTimeoutId)
       }
     }
-  }, [refetch, updatedFromServerAt, paths.join(':')])
+  }, [updatedFromServerAt, paths.join(':')])
 }
 
 export default useModelUpdatesListener
