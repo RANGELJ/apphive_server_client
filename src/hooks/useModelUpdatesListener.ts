@@ -42,7 +42,8 @@ const useModelUpdatesListener = ({
   const refetchRef = useRef(refetch)
   refetchRef.current = refetch
 
-  const updatedFromServerAt = updatedAtFromServer ?? 0
+  const updatedFromServerAtRef = useRef(updatedAtFromServer ?? 0)
+  updatedFromServerAtRef.current = updatedAtFromServer ?? 0
 
   useEffect(() => {
     if (paths.length === 0) {
@@ -64,7 +65,7 @@ const useModelUpdatesListener = ({
         return
       }
 
-      if (updatedFromFirebaseAt < updatedFromServerAt) {
+      if (updatedFromFirebaseAt < updatedFromServerAtRef.current) {
         return
       }
 
@@ -81,7 +82,7 @@ const useModelUpdatesListener = ({
         clearTimeout(refetchTimeoutId)
       }
     }
-  }, [updatedFromServerAt, paths.join(':')])
+  }, [subscribeToFirebaseRealtimeDbPath, paths.join(':')])
 }
 
 export default useModelUpdatesListener

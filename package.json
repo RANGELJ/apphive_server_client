@@ -1,6 +1,6 @@
 {
   "name": "@rangeljl/apphive_server_client",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "A set of hooks and functions that applications that query the apphive server uses",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
