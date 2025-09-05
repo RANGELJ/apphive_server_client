@@ -5,6 +5,7 @@ type Args = {
   getIdToken: () => Promise<string | null>
   path: `/${string}`
   searchParams?: [string, string | undefined][] | undefined
+  extraHeaders?: Record<string, string> | undefined
 }
 
 const apphiveServerRequestGet = async <ReturnType = unknown>({
@@ -12,8 +13,9 @@ const apphiveServerRequestGet = async <ReturnType = unknown>({
   getIdToken,
   path,
   searchParams,
+  extraHeaders,
 }: Args) => {
-  const headers: Record<string, string> = {}
+  const headers: Record<string, string> = extraHeaders ?? {}
 
   const idToken = await getIdToken()
 

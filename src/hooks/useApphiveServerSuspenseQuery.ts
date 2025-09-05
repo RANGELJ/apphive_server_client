@@ -13,8 +13,13 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
   path: `/${string}`,
   options?: Options
 ) => {
-  const { getIdToken, serverHost, firebaseUserUid, baseQueryKey } =
-    useContext(ApphiveServerContext)
+  const {
+    getIdToken,
+    serverHost,
+    firebaseUserUid,
+    baseQueryKey,
+    extraHeaders,
+  } = useContext(ApphiveServerContext)
 
   return useSuspenseQuery<ReturnType, ServerError>({
     queryKey: [...baseQueryKey, path, options?.searchParams, firebaseUserUid],
@@ -24,6 +29,7 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
         searchParams: options?.searchParams,
         serverHost,
         getIdToken,
+        extraHeaders,
       }),
     staleTime: options?.staleTimeInMillis ?? Infinity,
   })
