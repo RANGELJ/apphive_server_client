@@ -47,7 +47,7 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
       if (error instanceof ServerErrorClientShowable) {
         return false
       }
-      if (failureCount >= 4) {
+      if (failureCount >= 3) {
         return false
       }
       return true
