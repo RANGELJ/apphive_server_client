@@ -38,7 +38,7 @@
 
     // Recommended Options
     "strict": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,

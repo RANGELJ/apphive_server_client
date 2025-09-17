@@ -2,6 +2,8 @@ import { useContext, useEffect, useRef } from 'react'
 import unknownIsNumber from '@rangeljl/shared/unknownIsNumber'
 import useApphiveServerSuspenseQuery from './useApphiveServerSuspenseQuery'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
 
 type HookArgs = {
   modelProps: {
@@ -18,15 +20,40 @@ const useModelUpdatesListener = ({
   updatedAtFromServer,
   refetch,
 }: HookArgs) => {
-  const { subscribeToFirebaseRealtimeDbPath } = useContext(ApphiveServerContext)
-  const { data: modelNames } =
-    useApphiveServerSuspenseQuery<{ id: number; name: string }[]>(
-      '/models/names'
-    )
+  const {
+    subscribeToFirebaseRealtimeDbPath,
+    baseQueryKey,
+    serverHost,
+    getIdToken,
+    extraHeaders,
+  } = useContext(ApphiveServerContext)
 
-  const { data: propertyNames } = useApphiveServerSuspenseQuery<
-    { id: number; name: string }[]
-  >('/models/propertyNames')
+  const {
+    data: { names: modelNames, properties: propertyNames },
+  } = useSuspenseQuery({
+    queryKey: [baseQueryKey, 'modelsData'],
+    queryFn: async () => {
+      const names = await apphiveServerRequestGet<
+        { id: number; name: string }[]
+      >({
+        path: '/models/names',
+        serverHost,
+        getIdToken,
+        extraHeaders,
+      })
+
+      const properties = await apphiveServerRequestGet<
+        { id: number; name: string }[]
+      >({
+        path: '/models/propertyNames',
+        serverHost,
+        getIdToken,
+        extraHeaders,
+      })
+
+      return { names, properties }
+    },
+  })
 
   const paths = modelProps.map((modelProp) => {
     const modelNameId = modelNames.find(

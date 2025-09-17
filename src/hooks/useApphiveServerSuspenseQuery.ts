@@ -28,7 +28,13 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
   } = useContext(ApphiveServerContext)
 
   const query = useSuspenseQuery<ReturnType, ServerError>({
-    queryKey: [...baseQueryKey, path, options?.searchParams, firebaseUserUid],
+    queryKey: [
+      ...baseQueryKey,
+      'get',
+      path,
+      options?.searchParams,
+      firebaseUserUid,
+    ],
     queryFn: () =>
       apphiveServerRequestGet<ReturnType>({
         path,
