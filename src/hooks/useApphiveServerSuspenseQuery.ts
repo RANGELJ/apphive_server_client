@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
 import { useContext } from 'react'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
 import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
@@ -27,14 +27,16 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
     extraHeaders,
   } = useContext(ApphiveServerContext)
 
+  const queryKey = [
+    ...baseQueryKey,
+    'get',
+    path,
+    options?.searchParams,
+    firebaseUserUid,
+  ] as const
+
   const query = useSuspenseQuery<ReturnType, ServerError>({
-    queryKey: [
-      ...baseQueryKey,
-      'get',
-      path,
-      options?.searchParams,
-      firebaseUserUid,
-    ],
+    queryKey,
     queryFn: () =>
       apphiveServerRequestGet<ReturnType>({
         path,
@@ -55,8 +57,16 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
     staleTime: options?.staleTimeInMillis ?? Infinity,
   })
 
+  const queryClient = useQueryClient()
+
   useModelUpdatesListener({
-    refetch: query.refetch,
+    refetch: () => {
+      queryClient.removeQueries({
+        queryKey,
+        exact: true,
+      })
+      query.refetch()
+    },
     updatedAtFromServer: query.dataUpdatedAt,
     modelProps: options?.getPropsToListen?.(query.data) ?? [],
   })
