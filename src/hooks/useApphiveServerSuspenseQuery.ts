@@ -23,6 +23,7 @@ export type Options<ReturnType> = {
     prop: string
     identifier: string | number
   }[]
+  onRefetch?: () => void
 }
 
 /**
@@ -85,13 +86,17 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
   useModelUpdatesListener({
     refetch: options?.cleanOnRefetch
       ? () => {
+          options.onRefetch?.()
           queryClient.removeQueries({
             queryKey,
             exact: true,
           })
           query.refetch()
         }
-      : query.refetch,
+      : () => {
+          options?.onRefetch?.()
+          query.refetch()
+        },
     updatedAtFromServer: query.dataUpdatedAt,
     modelProps: options?.getPropsToListen?.(query.data) ?? [],
   })

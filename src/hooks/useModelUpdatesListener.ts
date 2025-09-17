@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef } from 'react'
+import { useCallback, useContext, useEffect, useRef } from 'react'
 import unknownIsNumber from '@rangeljl/shared/unknownIsNumber'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
 import { useSuspenseQuery } from '@tanstack/react-query'
@@ -68,22 +68,22 @@ const useModelUpdatesListener = ({
   const refetchRef = useRef(refetch)
   refetchRef.current = refetch
 
+  const timeoutRef = useRef<null | ReturnType<typeof setTimeout>>(null)
+
+  const debouncedRefetch = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+
+    timeoutRef.current = setTimeout(refetchRef.current, 100)
+  }, [])
+
   const updatedFromServerAtRef = useRef(updatedAtFromServer ?? 0)
   updatedFromServerAtRef.current = updatedAtFromServer ?? 0
 
   useEffect(() => {
     if (paths.length === 0) {
       return
-    }
-
-    let refetchTimeoutId: ReturnType<typeof setTimeout> | null = null
-
-    const debouncedRefetch = () => {
-      if (refetchTimeoutId) {
-        clearTimeout(refetchTimeoutId)
-      }
-
-      refetchTimeoutId = setTimeout(refetchRef.current, 100)
     }
 
     const listener = (updatedFromFirebaseAt: unknown) => {
@@ -104,9 +104,6 @@ const useModelUpdatesListener = ({
 
     return () => {
       unsubscribes.forEach((unsubscribe) => unsubscribe())
-      if (refetchTimeoutId) {
-        clearTimeout(refetchTimeoutId)
-      }
     }
   }, [subscribeToFirebaseRealtimeDbPath, paths.join(':')])
 }
