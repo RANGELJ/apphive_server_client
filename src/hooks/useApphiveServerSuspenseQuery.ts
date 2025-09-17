@@ -5,9 +5,19 @@ import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
 import { ServerError, ServerErrorClientShowable } from '../shared/ServerErrors'
 import useModelUpdatesListener from './useModelUpdatesListener'
 
-type Options<ReturnType> = {
+/**
+ * Options for {@link useApphiveServerSuspenseQuery}.
+ */
+export type Options<ReturnType> = {
   staleTimeInMillis?: number
   searchParams?: [string, string | undefined][]
+  /**
+   * When true, clears the exact query's cache before refetching, which makes the hook suspend
+   * until fresh data arrives and propagates errors to the nearest error boundary.
+   * When false, refetch keeps the cached data and typically does not suspend if data exists.
+   * Default: false.
+   */
+  cleanOnRefetch?: boolean
   getPropsToListen?: (data: ReturnType) => {
     name: string
     prop: string
@@ -15,6 +25,19 @@ type Options<ReturnType> = {
   }[]
 }
 
+/**
+ * Suspense-ready GET query to the Apphive server with optional cache-clean refetch behavior.
+ *
+ * @param path - API path starting with '/'.
+ * @param options - Query options.
+ * @param options.staleTimeInMillis - Time in ms to consider data fresh. Default: Infinity.
+ * @param options.searchParams - Tuple list of search params appended to the request.
+ * @param options.cleanOnRefetch - When true, performs a "clean" refetch (removes the exact
+ * cache entry before refetching, suspends until fresh data, and bubbles errors to the nearest
+ * error boundary). When false, refetch keeps existing cached data. Default: false.
+ * @param options.getPropsToListen - Map the fetched data to model props to automatically
+ * trigger refetches when the server notifies updates for those props.
+ */
 const useApphiveServerSuspenseQuery = <ReturnType>(
   path: `/${string}`,
   options?: Options<ReturnType>
@@ -60,13 +83,15 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
   const queryClient = useQueryClient()
 
   useModelUpdatesListener({
-    refetch: () => {
-      queryClient.removeQueries({
-        queryKey,
-        exact: true,
-      })
-      query.refetch()
-    },
+    refetch: options?.cleanOnRefetch
+      ? () => {
+          queryClient.removeQueries({
+            queryKey,
+            exact: true,
+          })
+          query.refetch()
+        }
+      : query.refetch,
     updatedAtFromServer: query.dataUpdatedAt,
     modelProps: options?.getPropsToListen?.(query.data) ?? [],
   })

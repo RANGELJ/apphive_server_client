@@ -1,6 +1,5 @@
 import { useContext, useEffect, useRef } from 'react'
 import unknownIsNumber from '@rangeljl/shared/unknownIsNumber'
-import useApphiveServerSuspenseQuery from './useApphiveServerSuspenseQuery'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
