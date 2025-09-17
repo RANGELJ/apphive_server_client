@@ -2,7 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query'
 import { useContext } from 'react'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
 import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
-import { ServerError } from '../shared/ServerErrors'
+import { ServerError, ServerErrorClientShowable } from '../shared/ServerErrors'
 import useModelUpdatesListener from './useModelUpdatesListener'
 
 type Options<ReturnType> = {
@@ -43,6 +43,15 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
         getIdToken,
         extraHeaders,
       }),
+    retry: (failureCount, error) => {
+      if (error instanceof ServerErrorClientShowable) {
+        return false
+      }
+      if (failureCount >= 4) {
+        return false
+      }
+      return true
+    },
     staleTime: options?.staleTimeInMillis ?? Infinity,
   })
 
