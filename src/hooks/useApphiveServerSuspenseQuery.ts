@@ -3,15 +3,21 @@ import { useContext } from 'react'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
 import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
 import { ServerError } from '../shared/ServerErrors'
+import useModelUpdatesListener from './useModelUpdatesListener'
 
-type Options = {
+type Options<ReturnType> = {
   staleTimeInMillis?: number
   searchParams?: [string, string | undefined][]
+  getPropsToListen?: (data: ReturnType) => {
+    name: string
+    prop: string
+    identifier: string | number
+  }[]
 }
 
 const useApphiveServerSuspenseQuery = <ReturnType>(
   path: `/${string}`,
-  options?: Options
+  options?: Options<ReturnType>
 ) => {
   const {
     getIdToken,
@@ -21,7 +27,7 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
     extraHeaders,
   } = useContext(ApphiveServerContext)
 
-  return useSuspenseQuery<ReturnType, ServerError>({
+  const query = useSuspenseQuery<ReturnType, ServerError>({
     queryKey: [...baseQueryKey, path, options?.searchParams, firebaseUserUid],
     queryFn: () =>
       apphiveServerRequestGet<ReturnType>({
@@ -33,6 +39,14 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
       }),
     staleTime: options?.staleTimeInMillis ?? Infinity,
   })
+
+  useModelUpdatesListener({
+    refetch: query.refetch,
+    updatedAtFromServer: query.dataUpdatedAt,
+    modelProps: options?.getPropsToListen?.(query.data) ?? [],
+  })
+
+  return query
 }
 
 export default useApphiveServerSuspenseQuery

@@ -5,7 +5,7 @@ type Args = {
   getIdToken: () => Promise<string | null>
   path: `/${string}`
   searchParams?: [string, string | undefined][] | undefined
-  extraHeaders?: Record<string, string> | undefined
+  extraHeaders: Record<string, string> | null
 }
 
 const apphiveServerRequestGet = async <ReturnType = unknown>({

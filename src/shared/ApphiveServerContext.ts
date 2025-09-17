@@ -5,7 +5,7 @@ type ApphiveServerContextType = {
   getIdToken: () => Promise<string | null>
   firebaseUserUid: string | null
   baseQueryKey: string[]
-  extraHeaders?: Record<string, string>
+  extraHeaders: Record<string, string> | null
   subscribeToFirebaseRealtimeDbPath: (
     path: string,
     listener: (value: unknown) => void
