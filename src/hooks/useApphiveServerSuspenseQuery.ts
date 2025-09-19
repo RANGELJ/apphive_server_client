@@ -1,5 +1,5 @@
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useMemo } from 'react'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
 import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
 import { ServerError, ServerErrorClientShowable } from '../shared/ServerErrors'
@@ -56,13 +56,17 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
     extraHeaders,
   } = useContext(ApphiveServerContext)
 
-  const queryKey = [
-    ...baseQueryKey,
-    'get',
-    path,
-    options?.searchParams,
-    firebaseUserUid,
-  ] as const
+  const queryKey = useMemo(
+    () =>
+      [
+        ...baseQueryKey,
+        'get',
+        path,
+        options?.searchParams,
+        firebaseUserUid,
+      ] as const,
+    [baseQueryKey, path, options?.searchParams, firebaseUserUid]
+  )
 
   const query = useSuspenseQuery<ReturnType, ServerError>({
     queryKey,
