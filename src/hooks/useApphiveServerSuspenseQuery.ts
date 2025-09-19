@@ -1,5 +1,5 @@
 import { useQueryClient, useSuspenseQuery } from '@tanstack/react-query'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import ApphiveServerContext from '../shared/ApphiveServerContext'
 import apphiveServerRequestGet from '../shared/apphiveServerRequestGet'
 import { ServerError, ServerErrorClientShowable } from '../shared/ServerErrors'
@@ -18,6 +18,11 @@ export type Options<ReturnType> = {
    * Default: false.
    */
   cleanOnRefetch?: boolean
+  /**
+   * When true, the query cache is removed when the component unmounts.
+   * Default: false.
+   */
+  invalidateOnUnmount?: boolean
   getPropsToListen?: (data: ReturnType) => {
     name: string
     prop: string
@@ -82,6 +87,18 @@ const useApphiveServerSuspenseQuery = <ReturnType>(
   })
 
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (!options?.invalidateOnUnmount) {
+      return
+    }
+    return () => {
+      queryClient.removeQueries({
+        queryKey,
+        exact: true,
+      })
+    }
+  }, [options?.invalidateOnUnmount, queryClient, queryKey])
 
   useModelUpdatesListener({
     refetch: options?.cleanOnRefetch
